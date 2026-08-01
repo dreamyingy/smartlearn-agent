@@ -85,16 +85,34 @@ def get_client() -> OpenAI:
     )
 
 
-def extract_pages(path: str) -> list:
-    """Return [(page_number, text)] for pages that hold text. Page numbers are
-    1-based, matching what a PDF reader shows."""
+def parse_page_range(value: str):
+    """Turn '2-7' into (2, 7). Returns None if the text is not a usable range."""
+    match = re.fullmatch(r"\s*(\d+)\s*-\s*(\d+)\s*", value)
+    if not match:
+        return None
+    start, end = int(match.group(1)), int(match.group(2))
+    if start < 1 or start > end:
+        return None
+    return start, end
+
+
+def extract_pages(path: str, page_range=None) -> tuple:
+    """Return ([(page_number, text)], total_page_count) for pages that hold text.
+
+    Page numbers are 1-based, matching what a PDF reader shows. page_range, when
+    given, is an inclusive (start, end) pair; pages outside it are skipped. The
+    total count covers the whole file, including pages holding no text, so the
+    caller can tell 'page does not exist' apart from 'page has no text'."""
     pages = []
     with pdfplumber.open(path) as pdf:
+        total = len(pdf.pages)
         for number, page in enumerate(pdf.pages, start=1):
+            if page_range and not page_range[0] <= number <= page_range[1]:
+                continue
             text = (page.extract_text() or "").strip()
             if text:
                 pages.append((number, text))
-    return pages
+    return pages, total
 
 
 def apply_budget(pages: list) -> tuple:
@@ -236,6 +254,12 @@ def main() -> int:
         nargs="?",
         help="Path to the PDF file to summarise",
     )
+    parser.add_argument(
+        "--pages",
+        metavar="START-END",
+        help="Summarise only this inclusive page range, for example 1-5. "
+        "Defaults to the whole document.",
+    )
     args = parser.parse_args()
 
     # A required positional would make argparse exit 2 here; the spec asks for a
@@ -244,6 +268,17 @@ def main() -> int:
         print(parser.format_usage().strip())
         print("Give me the path to a PDF file. Try --help for details.")
         return 1
+
+    page_range = None
+    if args.pages is not None:
+        page_range = parse_page_range(args.pages)
+        if page_range is None:
+            print(
+                f"Could not read --pages {args.pages}. Give an inclusive range "
+                "like 1-5, counting from page 1, with the start no later than "
+                "the end."
+            )
+            return 1
 
     path = args.pdf_path
     if not os.path.exists(path):
@@ -254,14 +289,23 @@ def main() -> int:
         return 1
 
     try:
-        pages = extract_pages(path)
+        pages, total = extract_pages(path, page_range)
     except Exception as exc:
         # Covers corrupt files, non-PDF files and password-protected PDFs alike.
         print(f"Could not read {path} as a PDF ({type(exc).__name__}).")
         return 1
 
+    if page_range and page_range[1] > total:
+        print(f"{path} has only {total} page(s), so --pages {args.pages} is out of range.")
+        return 1
+
     if not pages:
-        print(SCANNED_MESSAGE)
+        if page_range:
+            # Saying 'scanned PDF' here would be a wrong diagnosis: the pages exist,
+            # they just hold no text.
+            print(f"No extractable text on pages {args.pages} of {path}.")
+        else:
+            print(SCANNED_MESSAGE)
         return 1
 
     # Everything above this line runs without an API key, so a scanned PDF
