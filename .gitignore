@@ -3,3 +3,4 @@
 __pycache__/
 *.pyc
 hello_llm.py
+sample.txt
