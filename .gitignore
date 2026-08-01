@@ -4,3 +4,10 @@ __pycache__/
 *.pyc
 hello_llm.py
 sample.txt
+
+# Locally generated test fixtures for pdf_summary.py
+sample.pdf
+scanned.pdf
+photo.pdf
+pdf1.pdf
+Yuzhe_Zhuang_Report.pdf

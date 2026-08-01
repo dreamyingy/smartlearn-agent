@@ -8,7 +8,7 @@ from openai import OpenAI
 
 load_dotenv()
 
-MODEL = "deepseek/deepseek-v4-flash-0731"
+MODEL = "qwen/qwen3.5-flash-02-23"
 NOT_FOUND = "The text does not provide this information."
 
 SYSTEM_PROMPT = f"""You are a precise research assistant.

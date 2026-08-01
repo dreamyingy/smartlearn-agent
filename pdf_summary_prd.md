@@ -49,9 +49,7 @@ Exit codes:
 10. Print exactly three sections, in this order, with these exact headings:
     `Overview`, `Key Points`, `Limitations`. No extra sections, no preamble.
 11. Every bullet in `Key Points` must end with at least one `[Page X]` citation.
-12. `Limitations` states what the summary could not cover -- truncated pages,
-    unreadable tables/figures, or ambiguity in the source.
-13. Expected shape:
+12. Expected shape:
     ```
     ## Overview
     <2-4 sentences describing what the document is about>
@@ -66,10 +64,10 @@ Exit codes:
     ```
 
 ### Safety
-14. Never print the API key, and never echo it into an error message.
-15. Never print the raw PDF contents during normal operation. Only the summary
+13. Never print the API key, and never echo it into an error message.
+14. Never print the raw PDF contents during normal operation. Only the summary
     reaches stdout.
-16. On a network or API failure, print a short friendly message (error type only, not the exception body) and exit 1.
+15. On a network or API failure, print a short friendly message (error type only, not the exception body) and exit 1.
 
 ## Tech Constraints
 - Python, single file `pdf_summary.py` at the repo root.
