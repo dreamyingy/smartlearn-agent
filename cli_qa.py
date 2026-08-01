@@ -8,7 +8,7 @@ from openai import OpenAI
 
 load_dotenv()
 
-MODEL = "google/gemma-4-26b-a4b-it:free"
+MODEL = "deepseek/deepseek-v4-flash-0731"
 NOT_FOUND = "The text does not provide this information."
 
 SYSTEM_PROMPT = f"""You are a precise research assistant.
@@ -18,13 +18,11 @@ Rules:
 2. After EVERY claim, add a citation in the format [Paragraph X], placed before
    the full stop, like this: The sky is blue [Paragraph 1].
 3. If a sentence uses information from multiple paragraphs, cite all of them.
-4. Restate EVERY sentence of each paragraph you cite, in order, each as its own
-   sentence with its own citation. 
-5. Cite only the paragraphs that are relevant to the question. Ignore the rest.
-6. If the text does not contain the answer, reply with exactly this sentence and
+4. Cite only the paragraphs that are relevant to the question. Ignore the rest.
+5. If the text does not contain the answer, reply with exactly this sentence and
    nothing else:
 {NOT_FOUND}
-7. Do NOT add any information beyond what is in the text.
+6. Do NOT add any information beyond what is in the text.
 
 Example:
 If the text says:
