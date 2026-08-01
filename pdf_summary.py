@@ -59,7 +59,9 @@ Output rules:
 2. Print nothing else. No preamble, no closing remark, no extra sections.
 3. Overview is 2-4 sentences describing what the document is about. It carries no
    citations.
-4. Key Points is a list of '- ' bullets. EVERY bullet must end with at least one
+4. Key Points is a list of 3 to 5 '- ' bullets -- never fewer than three, never
+   more than five. Pick only the most important points and merge related ones so
+   the list stays inside that range. EVERY bullet must end with at least one
    citation in the form [Page X], after the full stop.
 5. Cite the page the information actually appears on. If a bullet draws on two
    pages, cite both, like [Page 2] [Page 5].
@@ -109,6 +111,9 @@ def extract_pages(path: str, page_range=None) -> tuple:
         for number, page in enumerate(pdf.pages, start=1):
             if page_range and not page_range[0] <= number <= page_range[1]:
                 continue
+            # Progress only, never the text itself, and on stderr so that stdout
+            # carries nothing but the summary.
+            print(f"Extracting page {number}/{total}...", file=sys.stderr)
             text = (page.extract_text() or "").strip()
             if text:
                 pages.append((number, text))
