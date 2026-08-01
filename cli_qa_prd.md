@@ -14,7 +14,7 @@
 ## Done when / acceptance tests:
   - User can paste text and ask questions in the terminal
   - Answers include [Paragraph X] citations
-  - Uses OpenRouter API (google/gemma-4-31b-it:free model)
+  - Uses OpenRouter API (google/gemma-4-26b-a4b-it:free model)
   - API key loaded from .env file and never printed
   - A question answered by Paragraph 1 cites [Paragraph 1]
   - A question absent from the text returns: The text does not provide this information.
